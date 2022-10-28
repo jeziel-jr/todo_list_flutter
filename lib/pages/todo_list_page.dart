@@ -1,7 +1,22 @@
 import 'package:flutter/material.dart';
 
-class TodoListPage extends StatelessWidget {
+import '../widgets/todo_list_item.dart';
+
+class TodoListPage extends StatefulWidget {
   const TodoListPage({super.key});
+
+  @override
+  State<TodoListPage> createState() => _TodoListPageState();
+}
+
+class _TodoListPageState extends State<TodoListPage> {
+  final TextEditingController tasksController = TextEditingController();
+//  date format function
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year} - ${date.hour}:${date.minute}';
+  }
+
+  List<String> tasks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +29,10 @@ class TodoListPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: TextField(
-                      decoration: InputDecoration(
+                      controller: tasksController,
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Adicione uma Tarefa',
                         hintText: 'Ex:. Estudar Flutter',
@@ -25,7 +41,12 @@ class TodoListPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        tasks.add(tasksController.text);
+                        tasksController.clear();
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.indigo[700],
                       padding: const EdgeInsets.all(17),
@@ -37,47 +58,37 @@ class TodoListPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              ListView(
-                shrinkWrap: true,
-                children: [
-                  ListTile(
-                    title: const Text('Tarefa 1'),
-                    subtitle: const Text('20/11/2022'),
-                    leading: const Icon(
-                      Icons.save,
-                      size: 30,
-                    ),
-                    onTap: () {
-                      print('Tarefa 1');
-                    },
-                  ),
-                  ListTile(
-                    title: const Text('Tarefa 2'),
-                    subtitle: const Text('22/11/2022'),
-                    leading: const Icon(
-                      Icons.person,
-                      size: 30,
-                    ),
-                    onTap: () {
-                      print('Tarefa 2');
-                    },
-                  ),
-                ],
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    for (String task in tasks)
+                      Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: TodoListItem(task, _formatDate),
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Você possui 0 tarefas pendetes',
-                      style: TextStyle(
+                      'Você possui ${tasks.length} tarefas pendetes',
+                      style: const TextStyle(
                         fontSize: 16,
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // clear all tasks
+                      setState(() {
+                        tasks.clear();
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.indigo[700],
                         padding: const EdgeInsets.all(14)),
